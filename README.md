@@ -29,30 +29,19 @@ El selector ya no utiliza emojis. Emplea archivos SVG de banderas dentro de
   un servidor web, no directamente con `file://`.
 
 
-## Google Traductor corregido
+## Google Traductor sin cambiar la URL
 
-La versión anterior utilizaba el antiguo widget JavaScript de Google y podía
-mostrar un error. Esta versión abre la página mediante el traductor web oficial
-de Google:
-
-`https://translate.google.com/translate`
+El selector utiliza el widget de Google Traductor integrado en la propia web.
+Al elegir un idioma, guarda la preferencia en la cookie `googtrans` y recarga
+la misma página.
 
 ### Funcionamiento
 
-- En una web pública, traduce la URL que el visitante está viendo.
-- En localhost usa como referencia `https://clinicadentalguayero.es` porque
-  Google no puede acceder a `localhost` ni a archivos `file://`.
-- Detecta automáticamente el idioma del navegador cuando la web ya está
-  publicada.
-- El idioma también puede elegirse manualmente mediante las banderas.
-
-### Cambiar el dominio de producción
-
-En `assets/js/main.js`, modifica:
-
-```js
-const GUAYERO_PRODUCTION_ORIGIN = 'https://clinicadentalguayero.es';
-```
+- El dominio, la ruta y los parámetros de la página permanecen iguales.
+- No se abre `translate.google.com` ni se navega a un dominio `translate.goog`.
+- El idioma elegido queda guardado para las demás páginas y futuras visitas.
+- Google Traductor requiere conexión a internet y que la web se abra mediante
+  HTTP o HTTPS.
 
 
 ## Navegación unificada
@@ -94,14 +83,9 @@ Debe probarse mediante HTTP/HTTPS y con conexión a internet.
 El selector ya no permanece desactivado mientras carga Google. Se puede abrir
 inmediatamente.
 
-Al elegir un idioma:
-
-1. intenta utilizar el widget oficial oculto de Google Traductor;
-2. si el widget no ha cargado o está bloqueado, abre automáticamente la página
-   mediante la URL web oficial de Google Traductor.
-
-En localhost se traduce la ruta pública equivalente de
-`https://clinicadentalguayero.es`, porque Google no puede acceder a localhost.
+Al elegir un idioma, el selector guarda la cookie que utiliza Google
+Traductor y recarga la URL actual. No existe ningún respaldo que redirija a una
+página externa, por lo que la dirección visible del sitio no cambia.
 
 
 ## Animaciones

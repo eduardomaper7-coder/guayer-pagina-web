@@ -248,26 +248,6 @@ function setClassicGoogleBar(language, forceOpen = false) {
   document.body.classList.add('has-classic-google-translate-bar');
 }
 
-// Se utiliza solamente como respaldo al probar el proyecto en localhost.
-// Cuando publiques la réplica en otro dominio, cambia esta dirección.
-const TRANSLATION_PUBLIC_ORIGIN = 'https://clinicadentalguayero.es';
-
-const TRANSLATION_PUBLIC_ROUTES = {
-  'index.html': '/',
-  'la-clinica.html': '/la-clinica/',
-  'el-equipo.html': '/el-equipo/',
-  'blog.html': '/blog/',
-  'contacto.html': '/contacto/',
-  'radiologia.html': '/radiologia/',
-  'escaner-intraoral.html': '/escaner-intraoral/',
-  'ortodoncia.html': '/ortodoncia/',
-  'cirugia-oral.html': '/cirugia-oral/',
-  'implantologia-avanzada.html': '/implantologia-avanzada/',
-  'politica-de-cookies.html': '/politica-de-cookies/',
-  'politica-de-privacidad.html': '/politica-de-privacidad/',
-  'aviso-legal.html': '/aviso-legal/'
-};
-
 function normalizeSelectedLanguage(language) {
   const normalized = String(language || '')
     .trim()
@@ -279,53 +259,25 @@ function normalizeSelectedLanguage(language) {
     : 'es';
 }
 
-function currentTranslationFileName() {
-  const parts = window.location.pathname.split('/').filter(Boolean);
-  const lastPart = parts.at(-1) || 'index.html';
-
-  return lastPart.includes('.') ? lastPart : 'index.html';
+// La traducción se conserva en una cookie propia de Google Traductor.
+// Al cambiar de idioma se recarga exactamente la misma URL, sin abrir
+// translate.google.com ni sustituir el dominio por translate.goog.
+function googleTranslationCookieValue(language) {
+  const selected = normalizeSelectedLanguage(language);
+  return selected === 'es' ? '' : `/es/${selected}`;
 }
 
-function isLocalTranslationPreview() {
-  const hostname = window.location.hostname;
+function setGoogleTranslationCookie(language) {
+  const value = googleTranslationCookieValue(language);
+  const secure = window.location.protocol === 'https:' ? ';Secure' : '';
 
-  return (
-    window.location.protocol === 'file:' ||
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname === '0.0.0.0' ||
-    hostname.endsWith('.local')
-  );
-}
-
-function sourcePageForGoogleTranslation() {
-  if (
-    !isLocalTranslationPreview() &&
-    /^https?:$/.test(window.location.protocol) &&
-    !window.location.hostname.endsWith('.translate.goog') &&
-    window.location.hostname !== 'translate.google.com'
-  ) {
-    const currentUrl = new URL(window.location.href);
-    currentUrl.hash = '';
-    return currentUrl.toString();
+  if (!value) {
+    clearGoogleTranslationCookies();
+    return;
   }
 
-  const route =
-    TRANSLATION_PUBLIC_ROUTES[currentTranslationFileName()] || '/';
-
-  return new URL(route, TRANSLATION_PUBLIC_ORIGIN).toString();
-}
-
-function buildGoogleTranslationUrl(language) {
-  const selected = normalizeSelectedLanguage(language);
-  const googleUrl = new URL('https://translate.google.com/translate');
-
-  googleUrl.searchParams.set('sl', 'es');
-  googleUrl.searchParams.set('tl', selected);
-  googleUrl.searchParams.set('hl', selected);
-  googleUrl.searchParams.set('u', sourcePageForGoogleTranslation());
-
-  return googleUrl.toString();
+  document.cookie =
+    `googtrans=${value};path=/;max-age=31536000;SameSite=Lax${secure}`;
 }
 
 function readTranslatedLanguage() {
@@ -355,13 +307,15 @@ function updateLanguageSelect(language) {
 }
 
 function clearGoogleTranslationCookies() {
-  document.cookie =
-    'googtrans=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  const expired =
+    'googtrans=;path=/;max-age=0;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax';
 
+  document.cookie = expired;
+
+  // Limpia también posibles cookies antiguas creadas por versiones previas.
   if (window.location.hostname && window.location.hostname.includes('.')) {
     document.cookie =
-      `googtrans=;path=/;domain=.${window.location.hostname};` +
-      'expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      `${expired};domain=.${window.location.hostname}`;
   }
 }
 
@@ -370,28 +324,7 @@ function restoreSpanishVersion() {
   localStorage.setItem('guayeroSelectedLanguage', 'es');
   updateLanguageSelect('es');
   setClassicGoogleBar('es');
-
-  // Si estamos dentro de una página traducida por Google, vuelve al original.
-  if (
-    window.location.hostname.endsWith('.translate.goog') ||
-    window.location.hostname === 'translate.google.com'
-  ) {
-    window.location.assign(sourcePageForGoogleTranslation());
-    return;
-  }
-
   window.location.reload();
-}
-
-function useOfficialGoogleWidget(language) {
-  const selected = normalizeSelectedLanguage(language);
-  const googleCombo = document.querySelector('.goog-te-combo');
-
-  if (!googleCombo) return false;
-
-  googleCombo.value = selected;
-  googleCombo.dispatchEvent(new Event('change', { bubbles: true }));
-  return true;
 }
 
 function applyGoogleTranslation(language) {
@@ -400,19 +333,11 @@ function applyGoogleTranslation(language) {
   localStorage.setItem('guayeroSelectedLanguage', selected);
   updateLanguageSelect(selected);
   setClassicGoogleBar(selected, true);
+  setGoogleTranslationCookie(selected);
 
-  if (selected === 'es') {
-    restoreSpanishVersion();
-    return;
-  }
-
-  // Primera opción: utiliza el selector oficial oculto de Google.
-  if (useOfficialGoogleWidget(selected)) return;
-
-  // Respaldo: si el script oficial tarda o está bloqueado, abre Google
-  // Traductor con la URL pública equivalente. Así el desplegable nunca queda
-  // inutilizado.
-  window.location.assign(buildGoogleTranslationUrl(selected));
+  // Mantiene el dominio y la ruta actuales. Google aplicará la cookie al
+  // inicializarse de nuevo después de la recarga.
+  window.location.reload();
 }
 
 languageSelect?.addEventListener('change', event => {
