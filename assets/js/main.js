@@ -172,6 +172,82 @@ const LANGUAGE_NAMES = {
   pl: 'Polski'
 };
 
+
+// Barra clásica de Google Traductor. Se crea por JavaScript para que aparezca
+// en todas las páginas sin modificar el selector de idiomas de la cabecera.
+let classicGoogleBar = null;
+let classicGoogleBarLanguage = 'es';
+
+function createClassicGoogleBar() {
+  if (classicGoogleBar) return classicGoogleBar;
+
+  const siteHeader = document.querySelector('.site-header');
+  if (!siteHeader) return null;
+
+  const bar = document.createElement('aside');
+  bar.className = 'classic-google-translate-bar skiptranslate';
+  bar.setAttribute('aria-label', 'Barra de Google Traductor');
+  bar.setAttribute('translate', 'no');
+  bar.hidden = true;
+  bar.innerHTML = `
+    <div class="classic-google-translate-inner">
+      <div class="classic-google-brand" aria-label="Google Traductor">
+        <span class="classic-google-g" aria-hidden="true">
+          <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
+        </span>
+        <span class="classic-google-product">Traductor</span>
+      </div>
+      <div class="classic-google-status">
+        <span>Traducido al:</span>
+        <strong data-classic-google-language>Español</strong>
+      </div>
+      <button class="classic-google-original" data-classic-google-original type="button">
+        Mostrar original
+      </button>
+      <button class="classic-google-close" data-classic-google-close type="button" aria-label="Cerrar barra de traducción">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>`;
+
+  siteHeader.insertAdjacentElement('afterend', bar);
+
+  bar.querySelector('[data-classic-google-original]')?.addEventListener(
+    'click',
+    restoreSpanishVersion
+  );
+
+  bar.querySelector('[data-classic-google-close]')?.addEventListener(
+    'click',
+    () => {
+      bar.hidden = true;
+      document.body.classList.remove('has-classic-google-translate-bar');
+    }
+  );
+
+  classicGoogleBar = bar;
+  return bar;
+}
+
+function setClassicGoogleBar(language, forceOpen = false) {
+  const selected = normalizeSelectedLanguage(language);
+  const bar = createClassicGoogleBar();
+  if (!bar) return;
+
+  classicGoogleBarLanguage = selected;
+
+  if (selected === 'es') {
+    bar.hidden = true;
+    document.body.classList.remove('has-classic-google-translate-bar');
+    return;
+  }
+
+  const languageLabel = bar.querySelector('[data-classic-google-language]');
+  if (languageLabel) languageLabel.textContent = LANGUAGE_NAMES[selected];
+
+  if (forceOpen || bar.hidden) bar.hidden = false;
+  document.body.classList.add('has-classic-google-translate-bar');
+}
+
 // Se utiliza solamente como respaldo al probar el proyecto en localhost.
 // Cuando publiques la réplica en otro dominio, cambia esta dirección.
 const TRANSLATION_PUBLIC_ORIGIN = 'https://clinicadentalguayero.es';
@@ -293,6 +369,7 @@ function restoreSpanishVersion() {
   clearGoogleTranslationCookies();
   localStorage.setItem('guayeroSelectedLanguage', 'es');
   updateLanguageSelect('es');
+  setClassicGoogleBar('es');
 
   // Si estamos dentro de una página traducida por Google, vuelve al original.
   if (
@@ -322,6 +399,7 @@ function applyGoogleTranslation(language) {
 
   localStorage.setItem('guayeroSelectedLanguage', selected);
   updateLanguageSelect(selected);
+  setClassicGoogleBar(selected, true);
 
   if (selected === 'es') {
     restoreSpanishVersion();
@@ -341,10 +419,12 @@ languageSelect?.addEventListener('change', event => {
   applyGoogleTranslation(event.target.value);
 });
 
-updateLanguageSelect(
+const initialSelectedLanguage =
   localStorage.getItem('guayeroSelectedLanguage') ||
-  readTranslatedLanguage()
-);
+  readTranslatedLanguage();
+
+updateLanguageSelect(initialSelectedLanguage);
+setClassicGoogleBar(initialSelectedLanguage);
 
 window.googleTranslateElementInit = function googleTranslateElementInit() {
   const target = document.getElementById('google_translate_element');

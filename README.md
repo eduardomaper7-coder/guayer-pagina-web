@@ -146,3 +146,12 @@ Se han incluido las 66 imágenes del archivo proporcionado.
 - Imágenes de radiología, escáner, ortodoncia, cirugía e implantología.
 - Logotipo y favicon originales.
 - Todas las galerías mantienen el popup de ampliación.
+
+
+## Barra clásica al traducir
+
+El selector de idiomas de la cabecera se mantiene sin cambios. Cuando se elige
+cualquier idioma distinto de español aparece debajo de la cabecera una barra
+clásica de Google Traductor con el idioma activo, el botón **Mostrar original**
+y el control para cerrar la barra. La barra se genera desde `assets/js/main.js`,
+por lo que funciona en todas las páginas.
