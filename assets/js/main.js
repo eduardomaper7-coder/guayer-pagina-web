@@ -151,18 +151,50 @@ window.addEventListener('resize', () => {
 setActiveNavigation();
 
 
+// Envío de formularios a cdguayero@gmail.com mediante FormSubmit (https://formsubmit.co)
+const FORM_ENDPOINT = 'https://formsubmit.co/ajax/cdguayero@gmail.com';
+
 document.querySelectorAll('form[data-demo-form]').forEach(form => {
-  form.addEventListener('submit', event => {
+  form.addEventListener('submit', async event => {
     event.preventDefault();
     const status = form.querySelector('[data-form-status]');
+    const button = form.querySelector('button[type="submit"]');
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
-    if (status) {
-      status.textContent = 'Formulario preparado. Conecta aquí tu servicio de correo o backend.';
+
+    const data = {
+      _subject: 'Nuevo mensaje desde la web - ' + document.title,
+      _template: 'table',
+      _captcha: 'false',
+      'Página': window.location.href
+    };
+    form.querySelectorAll('input, textarea, select').forEach(field => {
+      if (field.type === 'checkbox' || field.type === 'submit') return;
+      const label = (field.name || field.placeholder || 'Campo').replace(/\s*\(requerido\)/i, '');
+      if (field.value.trim()) data[label] = field.value.trim();
+      if (field.type === 'email' && field.value.trim()) data._replyto = field.value.trim();
+    });
+
+    if (button) button.disabled = true;
+    if (status) status.textContent = 'Enviando...';
+
+    try {
+      const response = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.success === false || result.success === 'false') throw new Error(result.message || 'Error');
+      if (status) status.textContent = '¡Gracias! Hemos recibido tu mensaje y te contactaremos pronto.';
+      form.reset();
+    } catch (error) {
+      if (status) status.textContent = 'No se ha podido enviar. Llámanos al +34 922 79 74 05 o escríbenos a cdguayero@gmail.com.';
+    } finally {
+      if (button) button.disabled = false;
     }
-    form.reset();
   });
 });
 
