@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /assets/images/originales-wordpress/
+
+Sitemap: https://clinicadentalguayero.es/sitemap.xml

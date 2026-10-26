@@ -1274,7 +1274,6 @@ html{scroll-behavior:smooth}
   transition:
     transform var(--motion-slow) var(--motion-ease),
     opacity var(--motion-medium) ease,
-    min-height var(--motion-fast) ease,
     box-shadow var(--motion-fast) ease;
 }
 
@@ -1287,24 +1286,7 @@ html{scroll-behavior:smooth}
   box-shadow:0 8px 28px rgba(0,0,0,.11);
 }
 
-@media (min-width:981px){
-  .site-header.is-scrolled,
-  .site-header.is-scrolled .header{min-height:70px}
-
-  .site-header.is-scrolled .nav > .nav-link,
-  .site-header.is-scrolled .dropdown > .nav-link,
-  .site-header.is-scrolled .nav > .phone,
-  .site-header.is-scrolled .language-select-wrap{
-    min-height:70px;
-    height:70px;
-  }
-
-  .site-header.is-scrolled .dropdown{min-height:70px}
-  .site-header.is-scrolled .brand img{
-    width:195px;
-    max-height:54px;
-  }
-}
+/* El menú mantiene siempre el mismo tamaño al hacer scroll. */
 
 .js-animations .hero-copy,
 .js-animations .treatment-hero-copy,
