@@ -1,0 +1,144 @@
+{
+  "redirects": [
+    {
+      "source": "/implantologia-avanzada.html",
+      "destination": "/implantes-dentales-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/implantologia-avanzada",
+      "destination": "/implantes-dentales-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/ortodoncia-invisible.html",
+      "destination": "/ortodoncia-invisible-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/ortodoncia-invisible",
+      "destination": "/ortodoncia-invisible-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/odontologia-general.html",
+      "destination": "/dentista-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/odontologia-general",
+      "destination": "/dentista-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/estetica-dental.html",
+      "destination": "/estetica-dental-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/estetica-dental",
+      "destination": "/estetica-dental-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/blanqueamiento-dental.html",
+      "destination": "/blanqueamiento-dental-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/blanqueamiento-dental",
+      "destination": "/blanqueamiento-dental-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/ortodoncia.html",
+      "destination": "/ortodoncia-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/ortodoncia",
+      "destination": "/ortodoncia-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/odontopediatria.html",
+      "destination": "/dentista-infantil-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/odontopediatria",
+      "destination": "/dentista-infantil-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/periodoncia.html",
+      "destination": "/periodoncia-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/periodoncia",
+      "destination": "/periodoncia-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/endodoncia.html",
+      "destination": "/endodoncia-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/endodoncia",
+      "destination": "/endodoncia-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/protesis-dentales.html",
+      "destination": "/protesis-dentales-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/protesis-dentales",
+      "destination": "/protesis-dentales-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/cirugia-oral.html",
+      "destination": "/cirugia-oral-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/cirugia-oral",
+      "destination": "/cirugia-oral-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/bruxismo-ferulas-descarga.html",
+      "destination": "/bruxismo-ferulas-descarga-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/bruxismo-ferulas-descarga",
+      "destination": "/bruxismo-ferulas-descarga-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/radiologia.html",
+      "destination": "/radiologia-dental-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/radiologia",
+      "destination": "/radiologia-dental-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/escaner-intraoral.html",
+      "destination": "/escaner-intraoral-los-cristianos.html",
+      "permanent": true
+    },
+    {
+      "source": "/escaner-intraoral",
+      "destination": "/escaner-intraoral-los-cristianos.html",
+      "permanent": true
+    }
+  ]
+}

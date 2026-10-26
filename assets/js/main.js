@@ -1,8 +1,12 @@
-// Barra de navegación única para todas las páginas.
-const menuToggle = document.querySelector('.menu-toggle');
-const mainNavigation = document.querySelector('.nav');
-const treatmentDropdown = document.querySelector('.dropdown');
-const treatmentToggle = document.querySelector('.nav-treatments');
+// ==========================================================
+// Menú superior (cabecera fija .gh-header), igual en todas las páginas.
+// ==========================================================
+const siteHeaderEl = document.querySelector('.gh-header');
+const menuBurger = document.querySelector('.gh-burger');
+const mainNavigation = document.querySelector('.gh-nav');
+const treatmentItem = document.querySelector('.gh-has-sub');
+const treatmentToggle = document.querySelector('.gh-sub-toggle');
+const MOBILE_MENU_QUERY = window.matchMedia('(max-width:1180px)');
 
 const NAV_PAGE_BY_FILE = {
   'index.html': 'home',
@@ -14,37 +18,26 @@ const NAV_PAGE_BY_FILE = {
   'implantes-dentales-poco-hueso.html': 'blog',
   'precio-implantes-dentales-los-cristianos.html': 'blog',
   'contacto.html': 'contact',
-  'radiologia.html': 'radiology',
-  'escaner-intraoral.html': 'scanner',
-  'ortodoncia.html': 'orthodontics',
-  'ortodoncia-invisible.html': 'aligners',
-  'odontopediatria.html': 'pediatric',
-  'periodoncia.html': 'periodontal',
-  'endodoncia.html': 'endodontic',
-  'estetica-dental.html': 'aesthetic',
-  'blanqueamiento-dental.html': 'whitening',
-  'protesis-dentales.html': 'prosthetic',
-  'odontologia-general.html': 'general',
-  'bruxismo-ferulas-descarga.html': 'bruxism',
-  'cirugia-oral.html': 'surgery',
-  'implantologia-avanzada.html': 'implants'
+  'radiologia-dental-los-cristianos.html': 'radiology',
+  'escaner-intraoral-los-cristianos.html': 'scanner',
+  'ortodoncia-los-cristianos.html': 'orthodontics',
+  'ortodoncia-invisible-los-cristianos.html': 'aligners',
+  'dentista-infantil-los-cristianos.html': 'pediatric',
+  'periodoncia-los-cristianos.html': 'periodontal',
+  'endodoncia-los-cristianos.html': 'endodontic',
+  'estetica-dental-los-cristianos.html': 'aesthetic',
+  'blanqueamiento-dental-los-cristianos.html': 'whitening',
+  'protesis-dentales-los-cristianos.html': 'prosthetic',
+  'dentista-los-cristianos.html': 'general',
+  'bruxismo-ferulas-descarga-los-cristianos.html': 'bruxism',
+  'cirugia-oral-los-cristianos.html': 'surgery',
+  'implantes-dentales-los-cristianos.html': 'implants'
 };
 
 const TREATMENT_PAGES = new Set([
-  'radiology',
-  'scanner',
-  'orthodontics',
-  'aligners',
-  'pediatric',
-  'periodontal',
-  'endodontic',
-  'aesthetic',
-  'whitening',
-  'prosthetic',
-  'general',
-  'bruxism',
-  'surgery',
-  'implants'
+  'radiology', 'scanner', 'orthodontics', 'aligners', 'pediatric',
+  'periodontal', 'endodontic', 'aesthetic', 'whitening', 'prosthetic',
+  'general', 'bruxism', 'surgery', 'implants'
 ]);
 
 function navigationFileName() {
@@ -56,103 +49,89 @@ function navigationFileName() {
 function setActiveNavigation() {
   const currentPage = NAV_PAGE_BY_FILE[navigationFileName()] || 'home';
 
-  document.querySelectorAll('[data-nav-page]').forEach(link => {
-    link.classList.remove('active');
-    link.removeAttribute('aria-current');
+  document.querySelectorAll('.gh-header [data-nav-page]').forEach(link => {
+    const isCurrent = link.dataset.navPage === currentPage;
+    link.classList.toggle('active', isCurrent);
+    if (isCurrent && link.tagName === 'A') link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
   });
 
-  const exactLink = document.querySelector(
-    `[data-nav-page="${currentPage}"]`
-  );
-
-  if (exactLink) {
-    exactLink.classList.add('active');
-    exactLink.setAttribute('aria-current', 'page');
-  }
-
-  if (TREATMENT_PAGES.has(currentPage) && treatmentToggle) {
-    treatmentToggle.classList.add('active');
-  }
-}
-
-function setMainMenu(open) {
-  if (!menuToggle || !mainNavigation) return;
-
-  mainNavigation.classList.toggle('open', open);
-  menuToggle.setAttribute('aria-expanded', String(open));
-  menuToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
-
-  const icon = menuToggle.querySelector('i');
-  if (icon) {
-    icon.classList.toggle('fa-bars', !open);
-    icon.classList.toggle('fa-xmark', open);
-  }
-
-  if (!open && treatmentDropdown && treatmentToggle) {
-    treatmentDropdown.classList.remove('open');
-    treatmentToggle.setAttribute('aria-expanded', 'false');
-  }
+  if (TREATMENT_PAGES.has(currentPage)) treatmentToggle?.classList.add('active');
 }
 
 function setTreatmentMenu(open) {
-  if (!treatmentDropdown || !treatmentToggle) return;
-
-  treatmentDropdown.classList.toggle('open', open);
+  if (!treatmentItem || !treatmentToggle) return;
+  treatmentItem.classList.toggle('is-open', open);
   treatmentToggle.setAttribute('aria-expanded', String(open));
 }
 
-menuToggle?.addEventListener('click', () => {
-  setMainMenu(!mainNavigation?.classList.contains('open'));
+function setMainMenu(open) {
+  if (!menuBurger) return;
+  document.documentElement.classList.toggle('gh-open', open);
+  menuBurger.setAttribute('aria-expanded', String(open));
+  menuBurger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+  if (!open) setTreatmentMenu(false);
+}
+
+menuBurger?.addEventListener('click', () => {
+  setMainMenu(!document.documentElement.classList.contains('gh-open'));
 });
 
 treatmentToggle?.addEventListener('click', event => {
-  if (window.innerWidth <= 980) {
-    event.preventDefault();
-    setTreatmentMenu(!treatmentDropdown?.classList.contains('open'));
-  }
+  event.stopPropagation();
+  setTreatmentMenu(!treatmentItem.classList.contains('is-open'));
 });
 
-document.querySelectorAll('.nav a[href]').forEach(link => {
+// Al elegir un enlace se cierra el menú (también en enlaces a #anclas).
+mainNavigation?.querySelectorAll('a[href]').forEach(link => {
   link.addEventListener('click', () => {
-    if (
-      window.innerWidth <= 980 &&
-      !link.classList.contains('nav-treatments')
-    ) {
-      setMainMenu(false);
-    }
+    setTreatmentMenu(false);
+    setMainMenu(false);
   });
 });
 
+// Clic fuera: cierra el submenú (escritorio) o el panel (móvil).
 document.addEventListener('click', event => {
-  if (
-    window.innerWidth <= 980 &&
-    mainNavigation?.classList.contains('open') &&
-    !mainNavigation.contains(event.target) &&
-    !menuToggle?.contains(event.target)
-  ) {
-    setMainMenu(false);
-  }
+  if (!siteHeaderEl || siteHeaderEl.contains(event.target)) return;
+  setTreatmentMenu(false);
+  setMainMenu(false);
 });
 
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') {
-    setTreatmentMenu(false);
-    setMainMenu(false);
-  }
+  if (event.key !== 'Escape') return;
+  const wasOpen = treatmentItem?.classList.contains('is-open');
+  setTreatmentMenu(false);
+  setMainMenu(false);
+  if (wasOpen) treatmentToggle?.focus();
 });
 
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 980) {
-    setMainMenu(false);
-    setTreatmentMenu(false);
-  }
+MOBILE_MENU_QUERY.addEventListener?.('change', () => {
+  setTreatmentMenu(false);
+  setMainMenu(false);
 });
 
 setActiveNavigation();
 
+// Sombra suave al hacer scroll. Solo cambia la opacidad de un
+// pseudo-elemento: el menú no se mueve ni cambia de tamaño.
+let headerShadowTicking = false;
 
-// Envío de formularios a cdguayero@gmail.com mediante FormSubmit (https://formsubmit.co)
-const FORM_ENDPOINT = 'https://formsubmit.co/ajax/cdguayero@gmail.com';
+function updateHeaderShadow() {
+  headerShadowTicking = false;
+  siteHeaderEl?.classList.toggle('is-scrolled', window.scrollY > 4);
+}
+
+window.addEventListener('scroll', () => {
+  if (headerShadowTicking) return;
+  headerShadowTicking = true;
+  window.requestAnimationFrame(updateHeaderShadow);
+}, { passive:true });
+
+updateHeaderShadow();
+
+
+// Envío de formularios a clinicaguayero@gmail.com mediante FormSubmit (https://formsubmit.co)
+const FORM_ENDPOINT = 'https://formsubmit.co/ajax/clinicaguayero@gmail.com';
 
 document.querySelectorAll('form[data-demo-form]').forEach(form => {
   form.addEventListener('submit', async event => {
@@ -191,7 +170,7 @@ document.querySelectorAll('form[data-demo-form]').forEach(form => {
       if (status) status.textContent = '¡Gracias! Hemos recibido tu mensaje y te contactaremos pronto.';
       form.reset();
     } catch (error) {
-      if (status) status.textContent = 'No se ha podido enviar. Llámanos al +34 922 79 74 05 o escríbenos a cdguayero@gmail.com.';
+      if (status) status.textContent = 'No se ha podido enviar. Llámanos al +34 922 79 74 05 o escríbenos a clinicaguayero@gmail.com.';
     } finally {
       if (button) button.disabled = false;
     }
@@ -235,7 +214,7 @@ let classicGoogleBarLanguage = 'es';
 function createClassicGoogleBar() {
   if (classicGoogleBar) return classicGoogleBar;
 
-  const siteHeader = document.querySelector('.site-header');
+  const siteHeader = document.querySelector('.gh-header');
   if (!siteHeader) return null;
 
   const bar = document.createElement('aside');
@@ -647,34 +626,81 @@ if (reducedMotion || !('IntersectionObserver' in window)) {
   revealElements.forEach(element => revealObserver.observe(element));
 }
 
-const animatedHeader = document.querySelector('.site-header');
+// La sombra del menú al hacer scroll está al principio de este archivo.
 
-function updateAnimatedHeader() {
-  animatedHeader?.classList.toggle('is-scrolled', window.scrollY > 34);
-}
 
-updateAnimatedHeader();
-window.addEventListener('scroll', updateAnimatedHeader, { passive:true });
+// El efecto parallax del fondo de cabecera se ha desactivado: repintaba
+// la imagen en cada evento de scroll y producía tirones.
 
-const animatedHero = document.querySelector(
-  '.hero,.page-hero,.clinic-page-hero,.team-page-hero,.treatment-hero-v2'
-);
-
-function updateHeroDepth() {
-  if (
-    reducedMotion ||
-    !animatedHero ||
-    window.innerWidth <= 980 ||
-    window.scrollY > window.innerHeight
-  ) {
+// ==========================================================
+// Aparición suave de los bloques [data-reveal] (portada y páginas interiores) al hacer scroll.
+(() => {
+  const items = document.querySelectorAll('[data-reveal]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window)) {
+    items.forEach(el => el.classList.add('is-in'));
     return;
   }
+  document.documentElement.classList.add('hp-motion');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-in');
+      io.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  items.forEach(el => io.observe(el));
+})();
 
-  animatedHero.style.setProperty(
-    '--hero-shift',
-    `${Math.min(window.scrollY * 0.08, 22)}px`
-  );
-}
+// ==========================================================
+// Aviso de cookies. Se muestra hasta que el usuario acepta o rechaza;
+// la elección se guarda en el navegador durante 12 meses.
+// ==========================================================
+(function cookieNotice() {
+  const KEY = 'guayero-cookies';
+  const MAX_AGE = 365 * 24 * 60 * 60 * 1000;
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (saved && Date.now() - saved.date < MAX_AGE) return;
+  } catch (e) { /* sin almacenamiento: se muestra el aviso */ }
 
-updateHeroDepth();
-window.addEventListener('scroll', updateHeroDepth, { passive:true });
+  const style = document.createElement('style');
+  style.textContent = `
+.gc-banner{position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:760px;margin:0 auto;
+  display:flex;align-items:center;gap:20px;padding:18px 22px;background:#221a15;color:#efe7da;
+  border-radius:6px;box-shadow:0 24px 50px -18px rgba(34,26,21,.6);
+  font:14px/1.5 "Manrope","Helvetica Neue",Arial,sans-serif}
+.gc-banner p{margin:0;flex:1}
+.gc-banner a{color:#d7ba68;text-decoration:underline}
+.gc-actions{display:flex;gap:10px;flex-shrink:0}
+.gc-btn{cursor:pointer;border-radius:999px;padding:10px 20px;font:600 14px/1 inherit;font-family:inherit;
+  border:1px solid #d7ba68;background:transparent;color:#efe7da}
+.gc-btn--accept{background:#d7ba68;color:#221a15}
+.gc-btn:hover{filter:brightness(1.08)}
+.gc-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media (max-width:640px){.gc-banner{flex-direction:column;align-items:stretch;gap:14px;padding:16px}
+  .gc-actions .gc-btn{flex:1}}`;
+  document.head.appendChild(style);
+
+  const banner = document.createElement('div');
+  banner.className = 'gc-banner';
+  banner.setAttribute('role', 'region');
+  banner.setAttribute('aria-label', 'Aviso de cookies');
+  banner.innerHTML =
+    '<p>Utilizamos cookies propias y de terceros para mejorar nuestros servicios y tu experiencia de navegación. ' +
+    'Puedes aceptar su uso o rechazarlas. ' +
+    'Más información en nuestra <a href="politica-de-cookies.html">Política de cookies</a>.</p>' +
+    '<div class="gc-actions">' +
+    '<button type="button" class="gc-btn" data-choice="rejected">Rechazar</button>' +
+    '<button type="button" class="gc-btn gc-btn--accept" data-choice="accepted">Aceptar</button>' +
+    '</div>';
+  banner.addEventListener('click', e => {
+    const btn = e.target.closest('[data-choice]');
+    if (!btn) return;
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ choice: btn.dataset.choice, date: Date.now() }));
+    } catch (err) { /* sin almacenamiento */ }
+    banner.remove();
+  });
+  document.body.appendChild(banner);
+})();
